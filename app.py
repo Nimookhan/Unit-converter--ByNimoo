@@ -1,119 +1,101 @@
+import streamlit as st
+
+# Light Theme CSS
+st.markdown(
+    """
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .stApp {
+            background-color: #f8f9fa;
+        }
+        .title {
+            color: #007bff;
+            font-size: 30px;
+            font-weight: bold;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+        }
+        .emoji {
+            font-size: 22px;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown('<p class="title">🔢 Unit Converter</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Convert Length, Temperature, and Weight easily! ⚡</p>', unsafe_allow_html=True)
+
+# Length Converter
 def length_converter():
     units = {
-        'm': {'name': 'Meters', 'factor': 1},
-        'cm': {'name': 'Centimeters', 'factor': 0.01},
-        'km': {'name': 'Kilometers', 'factor': 1000},
-        'in': {'name': 'Inches', 'factor': 0.0254},
-        'ft': {'name': 'Feet', 'factor': 0.3048}
+        'Meters (m)': 1, 'Centimeters (cm)': 0.01, 'Kilometers (km)': 1000,
+        'Inches (in)': 0.0254, 'Feet (ft)': 0.3048
     }
     
-    print("\nLength Units:")
-    for key, val in units.items():
-        print(f"{key}: {val['name']}")
-    
-    from_unit = input("Convert from (unit): ").lower()
-    to_unit = input("Convert to (unit): ").lower()
-    
-    if from_unit not in units or to_unit not in units:
-        print("Invalid unit!")
-        return
-    
-    value = float(input("Enter value: "))
-    
-    # Conversion logic
-    meters = value * units[from_unit]['factor']
-    result = meters / units[to_unit]['factor']
-    print(f"\nResult: {value} {units[from_unit]['name']} = {result:.2f} {units[to_unit]['name']}")
+    st.subheader("📏 Length Converter")
+    from_unit = st.selectbox("Convert from:", list(units.keys()))
+    to_unit = st.selectbox("Convert to:", list(units.keys()))
+    value = st.number_input("Enter value:", min_value=0.0, format="%.2f")
 
+    if st.button("Convert"):
+        meters = value * units[from_unit]
+        result = meters / units[to_unit]
+        st.success(f"✅ {value} {from_unit} = {result:.2f} {to_unit}")
+
+# Temperature Converter
 def temperature_converter():
-    units = {
-        'c': 'Celsius',
-        'f': 'Fahrenheit',
-        'k': 'Kelvin'
-    }
+    st.subheader("🌡️ Temperature Converter")
+    temp_units = {"Celsius (°C)": 'c', "Fahrenheit (°F)": 'f', "Kelvin (K)": 'k'}
     
-    print("\nTemperature Units:")
-    for key, val in units.items():
-        print(f"{key}: {val}")
-    
-    from_unit = input("Convert from (unit): ").lower()
-    to_unit = input("Convert to (unit): ").lower()
-    
-    temp = float(input("Enter temperature: "))
-    
-    if from_unit == 'c':
-        if to_unit == 'f':
-            result = (temp * 9/5) + 32
-        elif to_unit == 'k':
-            result = temp + 273.15
-        else:
-            result = temp
-    elif from_unit == 'f':
-        if to_unit == 'c':
-            result = (temp - 32) * 5/9
-        elif to_unit == 'k':
-            result = (temp - 32) * 5/9 + 273.15
-        else:
-            result = temp
-    elif from_unit == 'k':
-        if to_unit == 'c':
-            result = temp - 273.15
-        elif to_unit == 'f':
-            result = (temp - 273.15) * 9/5 + 32
-        else:
-            result = temp
-    else:
-        print("Invalid unit!")
-        return
-    
-    print(f"\nResult: {temp} {units[from_unit]} = {result:.2f} {units[to_unit]}")
+    from_unit = st.selectbox("Convert from:", list(temp_units.keys()))
+    to_unit = st.selectbox("Convert to:", list(temp_units.keys()))
+    temp = st.number_input("Enter temperature:", format="%.2f")
 
+    if st.button("Convert"):
+        f_unit = temp_units[from_unit]
+        t_unit = temp_units[to_unit]
+        
+        if f_unit == 'c':
+            result = (temp * 9/5) + 32 if t_unit == 'f' else temp + 273.15 if t_unit == 'k' else temp
+        elif f_unit == 'f':
+            result = (temp - 32) * 5/9 if t_unit == 'c' else (temp - 32) * 5/9 + 273.15 if t_unit == 'k' else temp
+        elif f_unit == 'k':
+            result = temp - 273.15 if t_unit == 'c' else (temp - 273.15) * 9/5 + 32 if t_unit == 'f' else temp
+
+        st.success(f"✅ {temp} {from_unit} = {result:.2f} {to_unit}")
+
+# Weight Converter
 def weight_converter():
     units = {
-        'kg': {'name': 'Kilograms', 'factor': 1},
-        'g': {'name': 'Grams', 'factor': 0.001},
-        'lb': {'name': 'Pounds', 'factor': 0.453592},
-        'oz': {'name': 'Ounces', 'factor': 0.0283495}
+        'Kilograms (kg)': 1, 'Grams (g)': 0.001, 'Pounds (lb)': 0.453592,
+        'Ounces (oz)': 0.0283495
     }
     
-    print("\nWeight Units:")
-    for key, val in units.items():
-        print(f"{key}: {val['name']}")
-    
-    from_unit = input("Convert from (unit): ").lower()
-    to_unit = input("Convert to (unit): ").lower()
-    
-    if from_unit not in units or to_unit not in units:
-        print("Invalid unit!")
-        return
-    
-    value = float(input("Enter value: "))
-    
-    # Conversion logic
-    kg = value * units[from_unit]['factor']
-    result = kg / units[to_unit]['factor']
-    print(f"\nResult: {value} {units[from_unit]['name']} = {result:.2f} {units[to_unit]['name']}")
+    st.subheader("⚖️ Weight Converter")
+    from_unit = st.selectbox("Convert from:", list(units.keys()))
+    to_unit = st.selectbox("Convert to:", list(units.keys()))
+    value = st.number_input("Enter value:", min_value=0.0, format="%.2f")
 
-def main_menu():
-    while True:
-        print("\nMain Menu")
-        print("1. Length Converter")
-        print("2. Temperature Converter")
-        print("3. Weight Converter")
-        print("4. Exit")
-        choice = input("Choose option (1-4): ")
-        
-        if choice == '1':
-            length_converter()
-        elif choice == '2':
-            temperature_converter()
-        elif choice == '3':
-            weight_converter()
-        elif choice == '4':
-            print("Exiting program...")
-            break
-        else:
-            print("Invalid choice!")
+    if st.button("Convert"):
+        kg = value * units[from_unit]
+        result = kg / units[to_unit]
+        st.success(f"✅ {value} {from_unit} = {result:.2f} {to_unit}")
 
-if _name_ == "_main_":
-    main_menu()
+# Main Menu
+st.sidebar.title("🛠️ Choose Converter")
+option = st.sidebar.radio("", ["📏 Length Converter", "🌡️ Temperature Converter", "⚖️ Weight Converter"])
+
+if option == "📏 Length Converter":
+    length_converter()
+elif option == "🌡️ Temperature Converter":
+    temperature_converter()
+elif option == "⚖️ Weight Converter":
+    weight_converter()
+
+
