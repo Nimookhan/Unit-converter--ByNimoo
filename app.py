@@ -93,26 +93,30 @@ conversion_type = st.sidebar.selectbox(
 
 value = st.number_input("🎯 Enter Value", value=0.0, format="%.2f")
 
-if value:
+if conversion_type == "📏 Length":
+    units = {"Meters": 1, "Kilometers": 0.001, "Centimeters": 100, "Millimeters": 1000, "Inches": 39.37, "Feet": 3.281, "Yards": 1.094, "Miles": 0.000621}
+elif conversion_type == "🏋️ Weight":
+    units = {"Kilograms": 1, "Grams": 1000, "Milligrams": 1e6, "Pounds": 2.205, "Ounces": 35.274}
+elif conversion_type == "🔥 Temperature":
+    units = {"Celsius": 1, "Fahrenheit": 1, "Kelvin": 1}
+elif conversion_type == "💨 Speed":
+    units = {"Meters per second": 1, "Kilometers per hour": 3.6, "Miles per hour": 2.237, "Feet per second": 3.281}
+elif conversion_type == "⏳ Time":
+    units = {"Seconds": 1, "Minutes": 1/60, "Hours": 1/3600, "Days": 1/86400}
+
+from_unit = st.selectbox(f"From Unit ({conversion_type})", list(units.keys()))
+to_unit = st.selectbox(f"To Unit ({conversion_type})", list(units.keys()))
+
+if st.button("Convert"):
     if conversion_type == "📏 Length":
-        from_unit = st.selectbox("📐 From Unit", list(length_converter(1, "Meters", "Meters").keys()))
-        to_unit = st.selectbox("📐 To Unit", list(length_converter(1, "Meters", "Meters").keys()))
         result = length_converter(value, from_unit, to_unit)
     elif conversion_type == "🏋️ Weight":
-        from_unit = st.selectbox("⚖️ From Unit", list(weight_converter(1, "Kilograms", "Kilograms").keys()))
-        to_unit = st.selectbox("⚖️ To Unit", list(weight_converter(1, "Kilograms", "Kilograms").keys()))
         result = weight_converter(value, from_unit, to_unit)
     elif conversion_type == "🔥 Temperature":
-        from_unit = st.selectbox("🌡 From Unit", ["Celsius", "Fahrenheit", "Kelvin"])
-        to_unit = st.selectbox("🌡 To Unit", ["Celsius", "Fahrenheit", "Kelvin"])
         result = temperature_converter(value, from_unit, to_unit)
     elif conversion_type == "💨 Speed":
-        from_unit = st.selectbox("🌪 From Unit", list(speed_converter(1, "Meters per second", "Meters per second").keys()))
-        to_unit = st.selectbox("🌪 To Unit", list(speed_converter(1, "Meters per second", "Meters per second").keys()))
         result = speed_converter(value, from_unit, to_unit)
     elif conversion_type == "⏳ Time":
-        from_unit = st.selectbox("⏱ From Unit", list(time_converter(1, "Seconds", "Seconds").keys()))
-        to_unit = st.selectbox("⏱ To Unit", list(time_converter(1, "Seconds", "Seconds").keys()))
         result = time_converter(value, from_unit, to_unit)
 
     # Display Converted Result
