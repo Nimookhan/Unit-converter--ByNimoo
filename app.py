@@ -1,123 +1,67 @@
 import streamlit as st
 import json
-from streamlit_lottie import st_lottie
 
-# Page Config
-st.set_page_config(page_title="🔄 Ultimate Unit Converter Pro", page_icon="🔢", layout="centered")
+# Page Configuration
+st.set_page_config(page_title="Google-Style Unit Converter", page_icon="🔢", layout="centered")
 
-# Custom CSS for better styling
+# Custom CSS for Google-like UI
 st.markdown(
     """
     <style>
         .stApp {
-            background-color: #f5f7fa;
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+        .converter-box {
+            background: #f8f9fa;
             padding: 20px;
             border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
-        .stButton > button {
-            background: #4CAF50;
-            color: white;
+        .formula-box {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
             font-weight: bold;
-            padding: 12px;
-            border-radius: 10px;
-            transition: 0.3s;
-        }
-        .stButton > button:hover {
-            background: #388E3C;
-            transform: scale(1.05);
-        }
-        .result-box {
-            background: #e3f2fd;
-            color: #000;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
         }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# Load Lottie Animation
-def load_lottie_file(filepath):
-    try:
-        with open(filepath, "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return None
+# Conversion Dictionaries
+length_units = {"Meter": 1, "Kilometer": 0.001, "Centimeter": 100, "Millimeter": 1000, "Inch": 39.37, "Foot": 3.281, "Yard": 1.094, "Mile": 0.000621}
+weight_units = {"Kilogram": 1, "Gram": 1000, "Milligram": 1e6, "Pound": 2.205, "Ounce": 35.274}
+time_units = {"Second": 1, "Minute": 1/60, "Hour": 1/3600, "Day": 1/86400}
 
-lottie_conversion = load_lottie_file("conversion_animation.json")
+def convert(value, from_unit, to_unit, unit_dict):
+    return value * (unit_dict[to_unit] / unit_dict[from_unit])
 
-# Conversion Functions
-def length_converter(value, from_unit, to_unit):
-    units = {"Meters": 1, "Kilometers": 0.001, "Centimeters": 100, "Millimeters": 1000, "Inches": 39.37, "Feet": 3.281, "Yards": 1.094, "Miles": 0.000621}
-    return value * (units[to_unit] / units[from_unit])
+# UI Elements
+st.title("🔢 Google-Style Unit Converter")
+st.write("Quickly convert units just like Google!")
 
-def weight_converter(value, from_unit, to_unit):
-    units = {"Kilograms": 1, "Grams": 1000, "Milligrams": 1e6, "Pounds": 2.205, "Ounces": 35.274}
-    return value * (units[to_unit] / units[from_unit])
+conversion_type = st.selectbox("Choose Conversion Type", ["Length", "Weight", "Time"])
 
-def temperature_converter(value, from_unit, to_unit):
-    conversions = {
-        ("Celsius", "Fahrenheit"): lambda v: (v * 9/5) + 32,
-        ("Fahrenheit", "Celsius"): lambda v: (v - 32) * 5/9,
-        ("Celsius", "Kelvin"): lambda v: v + 273.15,
-        ("Kelvin", "Celsius"): lambda v: v - 273.15,
-        ("Fahrenheit", "Kelvin"): lambda v: (v - 32) * 5/9 + 273.15,
-        ("Kelvin", "Fahrenheit"): lambda v: (v - 273.15) * 9/5 + 32
-    }
-    return conversions.get((from_unit, to_unit), lambda v: v)(value)
+if conversion_type == "Length":
+    units = length_units
+elif conversion_type == "Weight":
+    units = weight_units
+elif conversion_type == "Time":
+    units = time_units
 
-def speed_converter(value, from_unit, to_unit):
-    units = {"Meters per second": 1, "Kilometers per hour": 3.6, "Miles per hour": 2.237, "Feet per second": 3.281}
-    return value * (units[to_unit] / units[from_unit])
-
-def time_converter(value, from_unit, to_unit):
-    units = {"Seconds": 1, "Minutes": 1/60, "Hours": 1/3600, "Days": 1/86400}
-    return value * (units[to_unit] / units[from_unit])
-
-# Streamlit UI
-st.title("🔢 Ultimate Unit Converter Pro")
-st.markdown("<h3 style='color: #FFB400;'>Convert anything instantly! 🚀</h3>", unsafe_allow_html=True)
-
-if lottie_conversion:
-    st_lottie(lottie_conversion, height=200, key="conversion")
-
-# Sidebar Selection
-conversion_type = st.sidebar.selectbox(
-    "🔀 Choose Conversion Type",
-    ["📏 Length", "🏋️ Weight", "🔥 Temperature", "💨 Speed", "⏳ Time"]
-)
-
-value = st.number_input("🎯 Enter Value", value=0.0, format="%.2f")
-
-if conversion_type == "📏 Length":
-    units = {"Meters": 1, "Kilometers": 0.001, "Centimeters": 100, "Millimeters": 1000, "Inches": 39.37, "Feet": 3.281, "Yards": 1.094, "Miles": 0.000621}
-elif conversion_type == "🏋️ Weight":
-    units = {"Kilograms": 1, "Grams": 1000, "Milligrams": 1e6, "Pounds": 2.205, "Ounces": 35.274}
-elif conversion_type == "🔥 Temperature":
-    units = {"Celsius": 1, "Fahrenheit": 1, "Kelvin": 1}
-elif conversion_type == "💨 Speed":
-    units = {"Meters per second": 1, "Kilometers per hour": 3.6, "Miles per hour": 2.237, "Feet per second": 3.281}
-elif conversion_type == "⏳ Time":
-    units = {"Seconds": 1, "Minutes": 1/60, "Hours": 1/3600, "Days": 1/86400}
-
-from_unit = st.selectbox(f"From Unit ({conversion_type})", list(units.keys()))
-to_unit = st.selectbox(f"To Unit ({conversion_type})", list(units.keys()))
+value = st.number_input("Enter Value", value=1.0, format="%.2f")
+from_unit = st.selectbox("From", list(units.keys()))
+to_unit = st.selectbox("To", list(units.keys()))
 
 if st.button("Convert"):
-    if conversion_type == "📏 Length":
-        result = length_converter(value, from_unit, to_unit)
-    elif conversion_type == "🏋️ Weight":
-        result = weight_converter(value, from_unit, to_unit)
-    elif conversion_type == "🔥 Temperature":
-        result = temperature_converter(value, from_unit, to_unit)
-    elif conversion_type == "💨 Speed":
-        result = speed_converter(value, from_unit, to_unit)
-    elif conversion_type == "⏳ Time":
-        result = time_converter(value, from_unit, to_unit)
-
-    # Display Converted Result
-    st.markdown(f"<div class='result-box'>✅ Converted Value: {result:.2f} {to_unit}</div>", unsafe_allow_html=True)
+    result = convert(value, from_unit, to_unit, units)
+    formula = f"Multiply the {conversion_type.lower()} value by {units[to_unit] / units[from_unit]:.4f}"
+    
+    st.markdown(f"""
+        <div class='converter-box'>
+            <h2>{value} {from_unit} = {result:.2f} {to_unit}</h2>
+            <div class='formula-box'>Formula: {formula}</div>
+        </div>
+    """, unsafe_allow_html=True)
