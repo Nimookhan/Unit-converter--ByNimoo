@@ -1,70 +1,119 @@
-import streamlit as st
-import json
-
-# Page Configuration
-st.set_page_config(page_title="Ultimate Unit Converter", page_icon="🔢", layout="centered")
-
-# Custom CSS for styling
-st.markdown(
-    """
-    <style>
-        .container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-            width: 60%;
-            margin: auto;
-            text-align: center;
-        }
-        .formula-box {
-            background: #f4f4f4;
-            padding: 10px;
-            border-radius: 5px;
-            display: inline-block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        select, input {
-            padding: 8px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        .result {
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Unit conversion logic
-def length_converter(value, from_unit, to_unit):
+def length_converter():
     units = {
-        "Meters": 1, "Kilometers": 0.001, "Centimeters": 100, "Millimeters": 1000,
-        "Inches": 39.37, "Feet": 3.281, "Yards": 1.094, "Miles": 0.000621
+        'm': {'name': 'Meters', 'factor': 1},
+        'cm': {'name': 'Centimeters', 'factor': 0.01},
+        'km': {'name': 'Kilometers', 'factor': 1000},
+        'in': {'name': 'Inches', 'factor': 0.0254},
+        'ft': {'name': 'Feet', 'factor': 0.3048}
     }
-    return value * (units[to_unit] / units[from_unit])
-
-# UI Layout
-st.markdown("<div class='container'>", unsafe_allow_html=True)
-st.markdown("## Unit Converter")
-
-# Dropdowns for unit selection
-conversion_type = st.selectbox("Select Conversion Type", ["Length", "Weight", "Temperature"])
-value = st.number_input("Enter Value", value=1.0, format="%.2f")
-
-if conversion_type == "Length":
-    from_unit = st.selectbox("From Unit", ["Meters", "Kilometers", "Centimeters", "Millimeters", "Inches", "Feet", "Yards", "Miles"])
-    to_unit = st.selectbox("To Unit", ["Meters", "Kilometers", "Centimeters", "Millimeters", "Inches", "Feet", "Yards", "Miles"])
-    result = length_converter(value, from_unit, to_unit)
-    formula = f"Multiply the length value by {round((length_converter(1, from_unit, to_unit)), 4)}"
     
-    # Display result
-    st.markdown(f"<div class='result'>{value} {from_unit} = {round(result, 2)} {to_unit}</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='formula-box'>Formula: {formula}</div>", unsafe_allow_html=True)
+    print("\nLength Units:")
+    for key, val in units.items():
+        print(f"{key}: {val['name']}")
+    
+    from_unit = input("Convert from (unit): ").lower()
+    to_unit = input("Convert to (unit): ").lower()
+    
+    if from_unit not in units or to_unit not in units:
+        print("Invalid unit!")
+        return
+    
+    value = float(input("Enter value: "))
+    
+    # Conversion logic
+    meters = value * units[from_unit]['factor']
+    result = meters / units[to_unit]['factor']
+    print(f"\nResult: {value} {units[from_unit]['name']} = {result:.2f} {units[to_unit]['name']}")
 
-st.markdown("</div>", unsafe_allow_html=True)
+def temperature_converter():
+    units = {
+        'c': 'Celsius',
+        'f': 'Fahrenheit',
+        'k': 'Kelvin'
+    }
+    
+    print("\nTemperature Units:")
+    for key, val in units.items():
+        print(f"{key}: {val}")
+    
+    from_unit = input("Convert from (unit): ").lower()
+    to_unit = input("Convert to (unit): ").lower()
+    
+    temp = float(input("Enter temperature: "))
+    
+    if from_unit == 'c':
+        if to_unit == 'f':
+            result = (temp * 9/5) + 32
+        elif to_unit == 'k':
+            result = temp + 273.15
+        else:
+            result = temp
+    elif from_unit == 'f':
+        if to_unit == 'c':
+            result = (temp - 32) * 5/9
+        elif to_unit == 'k':
+            result = (temp - 32) * 5/9 + 273.15
+        else:
+            result = temp
+    elif from_unit == 'k':
+        if to_unit == 'c':
+            result = temp - 273.15
+        elif to_unit == 'f':
+            result = (temp - 273.15) * 9/5 + 32
+        else:
+            result = temp
+    else:
+        print("Invalid unit!")
+        return
+    
+    print(f"\nResult: {temp} {units[from_unit]} = {result:.2f} {units[to_unit]}")
+
+def weight_converter():
+    units = {
+        'kg': {'name': 'Kilograms', 'factor': 1},
+        'g': {'name': 'Grams', 'factor': 0.001},
+        'lb': {'name': 'Pounds', 'factor': 0.453592},
+        'oz': {'name': 'Ounces', 'factor': 0.0283495}
+    }
+    
+    print("\nWeight Units:")
+    for key, val in units.items():
+        print(f"{key}: {val['name']}")
+    
+    from_unit = input("Convert from (unit): ").lower()
+    to_unit = input("Convert to (unit): ").lower()
+    
+    if from_unit not in units or to_unit not in units:
+        print("Invalid unit!")
+        return
+    
+    value = float(input("Enter value: "))
+    
+    # Conversion logic
+    kg = value * units[from_unit]['factor']
+    result = kg / units[to_unit]['factor']
+    print(f"\nResult: {value} {units[from_unit]['name']} = {result:.2f} {units[to_unit]['name']}")
+
+def main_menu():
+    while True:
+        print("\nMain Menu")
+        print("1. Length Converter")
+        print("2. Temperature Converter")
+        print("3. Weight Converter")
+        print("4. Exit")
+        choice = input("Choose option (1-4): ")
+        
+        if choice == '1':
+            length_converter()
+        elif choice == '2':
+            temperature_converter()
+        elif choice == '3':
+            weight_converter()
+        elif choice == '4':
+            print("Exiting program...")
+            break
+        else:
+            print("Invalid choice!")
+
+if _name_ == "_main_":
+    main_menu()
