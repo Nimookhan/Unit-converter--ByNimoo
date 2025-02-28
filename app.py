@@ -2,66 +2,69 @@ import streamlit as st
 import json
 
 # Page Configuration
-st.set_page_config(page_title="Google-Style Unit Converter", page_icon="🔢", layout="centered")
+st.set_page_config(page_title="Ultimate Unit Converter", page_icon="🔢", layout="centered")
 
-# Custom CSS for Google-like UI
+# Custom CSS for styling
 st.markdown(
     """
     <style>
-        .stApp {
-            background-color: #ffffff;
-            font-family: Arial, sans-serif;
-        }
-        .converter-box {
-            background: #f8f9fa;
+        .container {
+            background: #fff;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            width: 60%;
+            margin: auto;
+            text-align: center;
         }
         .formula-box {
-            background: #fff3cd;
+            background: #f4f4f4;
             padding: 10px;
             border-radius: 5px;
-            font-size: 16px;
+            display: inline-block;
+            margin-top: 10px;
             font-weight: bold;
+        }
+        select, input {
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
         }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# Conversion Dictionaries
-length_units = {"Meter": 1, "Kilometer": 0.001, "Centimeter": 100, "Millimeter": 1000, "Inch": 39.37, "Foot": 3.281, "Yard": 1.094, "Mile": 0.000621}
-weight_units = {"Kilogram": 1, "Gram": 1000, "Milligram": 1e6, "Pound": 2.205, "Ounce": 35.274}
-time_units = {"Second": 1, "Minute": 1/60, "Hour": 1/3600, "Day": 1/86400}
+# Unit conversion logic
+def length_converter(value, from_unit, to_unit):
+    units = {
+        "Meters": 1, "Kilometers": 0.001, "Centimeters": 100, "Millimeters": 1000,
+        "Inches": 39.37, "Feet": 3.281, "Yards": 1.094, "Miles": 0.000621
+    }
+    return value * (units[to_unit] / units[from_unit])
 
-def convert(value, from_unit, to_unit, unit_dict):
-    return value * (unit_dict[to_unit] / unit_dict[from_unit])
+# UI Layout
+st.markdown("<div class='container'>", unsafe_allow_html=True)
+st.markdown("## Unit Converter")
 
-# UI Elements
-st.title("🔢 Google-Style Unit Converter")
-st.write("Quickly convert units just like Google!")
-
-conversion_type = st.selectbox("Choose Conversion Type", ["Length", "Weight", "Time"])
+# Dropdowns for unit selection
+conversion_type = st.selectbox("Select Conversion Type", ["Length", "Weight", "Temperature"])
+value = st.number_input("Enter Value", value=1.0, format="%.2f")
 
 if conversion_type == "Length":
-    units = length_units
-elif conversion_type == "Weight":
-    units = weight_units
-elif conversion_type == "Time":
-    units = time_units
-
-value = st.number_input("Enter Value", value=1.0, format="%.2f")
-from_unit = st.selectbox("From", list(units.keys()))
-to_unit = st.selectbox("To", list(units.keys()))
-
-if st.button("Convert"):
-    result = convert(value, from_unit, to_unit, units)
-    formula = f"Multiply the {conversion_type.lower()} value by {units[to_unit] / units[from_unit]:.4f}"
+    from_unit = st.selectbox("From Unit", ["Meters", "Kilometers", "Centimeters", "Millimeters", "Inches", "Feet", "Yards", "Miles"])
+    to_unit = st.selectbox("To Unit", ["Meters", "Kilometers", "Centimeters", "Millimeters", "Inches", "Feet", "Yards", "Miles"])
+    result = length_converter(value, from_unit, to_unit)
+    formula = f"Multiply the length value by {round((length_converter(1, from_unit, to_unit)), 4)}"
     
-    st.markdown(f"""
-        <div class='converter-box'>
-            <h2>{value} {from_unit} = {result:.2f} {to_unit}</h2>
-            <div class='formula-box'>Formula: {formula}</div>
-        </div>
-    """, unsafe_allow_html=True)
+    # Display result
+    st.markdown(f"<div class='result'>{value} {from_unit} = {round(result, 2)} {to_unit}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='formula-box'>Formula: {formula}</div>", unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
